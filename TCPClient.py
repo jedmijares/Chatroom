@@ -1,6 +1,9 @@
 from socket import *
 
-serverName = "localhost"
+# serverName = '172.17.255.255'
+# serverName = '172.17.0.1'
+serverName = '192.168.0.9'
+# serverName = '172.17.255.255'
 serverPort = 12000
 
 # create TCP socket on client to use for connecting to remote server.  

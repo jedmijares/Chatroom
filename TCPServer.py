@@ -19,11 +19,11 @@ if(answer == 'y'):
         def run(self):
             while True:
                 message = None
-                message = (self.socket.recv(1024)).decode('ascii')
+                message = (self.socket.recv(1024)).decode()
                 if message:
                     for client in activeConnections:
                         if client != self:
-                            client.socket.sendall(message.encode('ascii'))
+                            client.socket.sendall(message.encode())
 
     # create TCP welcoming socket
     serverSocket = socket(AF_INET,SOCK_STREAM)
@@ -45,7 +45,7 @@ if(answer == 'y'):
         activeConnections.append(newConnection)
 
     #     # read a sentence of bytes from socket sent by the client
-    #     sentence = connectionSocket.recv(1024).decode('ascii')
+    #     sentence = connectionSocket.recv(1024).decode()
 
     #     # output to console the sentence received from the client
     #     print (sentence)
@@ -57,7 +57,7 @@ if(answer == 'y'):
     #     # capitalizedSentence = sentence.upper()
         
     #     # send back modified sentence over the TCP connection
-    #     connectionSocket.send((username + ': ' + capitalizedSentence).encode('ascii'))
+    #     connectionSocket.send((username + ': ' + capitalizedSentence).encode())
 
     #     # output to console the sentence sent back to the client
     #     print (username + ':' + capitalizedSentence)
@@ -77,7 +77,7 @@ else: # client
                 print('{}: '.format(self.name), end='')
                 sys.stdout.flush()
                 message = sys.stdin.readline()[:-1]
-                self.socket.sendall('{}: {}'.format(self.name, message).encode('ascii'))
+                self.socket.sendall('{}: {}'.format(self.name, message).encode())
 
     class Receiver(threading.Thread):
         def __init__(self, socket, name):
@@ -87,7 +87,7 @@ else: # client
         
         def run(self):
             while True:
-                message = self.socket.recv(1024).decode('ascii')
+                message = self.socket.recv(1024).decode()
                 if message:
                     print('\r{}\n{}: '.format(message, self.name), end = '')
                     # print("test")
@@ -124,13 +124,13 @@ else: # client
     #     sentence = input("")
 
     #     # send the user's line over the TCP connection
-    #     clientSocket.send((username + ': ' + sentence).encode('ascii'))
+    #     clientSocket.send((username + ': ' + sentence).encode())
 
     #     #output to console what is sent to the server
     #     print (username + ': ' + sentence)
 
     #     # get user's line back from server having been modified by the server
-    #     modifiedSentence = clientSocket.recv(1024).decode('ascii')
+    #     modifiedSentence = clientSocket.recv(1024).decode()
 
     #     # output the modified user's line
     #     print (modifiedSentence)

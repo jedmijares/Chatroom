@@ -1,6 +1,7 @@
 from socket import *
 import threading
 import sys
+import os
 
 answer = input("Will you host? ")
 
@@ -44,26 +45,6 @@ if(answer == 'y'):
         newConnection.start()
         activeConnections.append(newConnection)
 
-    #     # read a sentence of bytes from socket sent by the client
-    #     sentence = connectionSocket.recv(1024).decode()
-
-    #     # output to console the sentence received from the client
-    #     print (sentence)
-
-    #     # interactively get user's line to be converted to upper case
-    #     capitalizedSentence = input("")
-        
-    #     # # convert the sentence to upper case
-    #     # capitalizedSentence = sentence.upper()
-        
-    #     # send back modified sentence over the TCP connection
-    #     connectionSocket.send((username + ': ' + capitalizedSentence).encode())
-
-    #     # output to console the sentence sent back to the client
-    #     print (username + ':' + capitalizedSentence)
-        
-    #     # close the TCP connection; the welcoming socket continues
-    # connectionSocket.close()
 else: # client
 
     class Sender(threading.Thread):
@@ -77,7 +58,14 @@ else: # client
                 print('{}: '.format(self.name), end='')
                 sys.stdout.flush()
                 message = sys.stdin.readline()[:-1]
-                self.socket.sendall('{}: {}'.format(self.name, message).encode())
+                if message[0:len("!send ")] == "!send ":
+                    filename = message[len("!send "):]
+                    filesize = os.path.getsize(filename)
+                    SEPARATOR = "<SEPARATOR>"
+                    # send the filename and filesize
+                    self.socket.send(f"{filename}{SEPARATOR}{filesize}".encode())
+                else:
+                    self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
 
     class Receiver(threading.Thread):
         def __init__(self, socket, name):
@@ -117,23 +105,3 @@ else: # client
 
     receiver = Receiver(clientSocket, username)
     receiver.start()
-
-
-    # while True:
-    #     # interactively get user's line to be converted to upper case
-    #     sentence = input("")
-
-    #     # send the user's line over the TCP connection
-    #     clientSocket.send((username + ': ' + sentence).encode())
-
-    #     #output to console what is sent to the server
-    #     print (username + ': ' + sentence)
-
-    #     # get user's line back from server having been modified by the server
-    #     modifiedSentence = clientSocket.recv(1024).decode()
-
-    #     # output the modified user's line
-    #     print (modifiedSentence)
-
-    # # close the TCP connection
-    # clientSocket.close()

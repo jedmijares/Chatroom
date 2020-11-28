@@ -1,10 +1,43 @@
 from socket import *
 import threading
 import sys
+import os
 
 answer = input("Will you host? ")
 
-if(answer == 'y'):
+def receiveFile(message, mySocket):
+    SEPARATOR = "<SEPARATOR>"
+    filename, filesize = message[4:].split(SEPARATOR)
+    # remove absolute path if there is
+    filename = os.path.basename(filename)
+    # convert to integer
+    filesize = int(filesize)
+    with open(filename, "wb") as f:
+        for _ in range(filesize):
+            BUFFER_SIZE = 1
+            # read bytes from the socket (receive)
+            bytes_read = mySocket.recv(BUFFER_SIZE)
+            if not bytes_read:    
+                # nothing is received
+                # file transmitting is done
+                break
+            # write to the file the bytes we just received
+            f.write(bytes_read)
+
+def sendFile(filename, filesize, mySocket):
+    with open(filename, "rb") as f:
+        for _ in range(int(filesize)):
+            # read the bytes from the file
+            BUFFER_SIZE = 1 # send 4096 bytes each time step
+            bytes_read = f.read(BUFFER_SIZE)
+            if not bytes_read:
+                # file transmitting is done
+                break
+            # we use sendall to assure transimission in 
+            # busy networks
+            mySocket.sendall(bytes_read)
+
+if(answer == 'y'): # begin as server
 
     serverPort = 12000
     activeConnections = []
@@ -21,9 +54,20 @@ if(answer == 'y'):
                 message = None
                 message = (self.socket.recv(1024)).decode()
                 if message:
-                    for client in activeConnections:
-                        if client != self:
-                            client.socket.sendall(message.encode())
+                    if message[:4] == "TEXT": 
+                        for client in activeConnections:
+                            if client != self: # send to every client except the one that sent this
+                                client.socket.sendall(message.encode()) # send message after header
+                    elif message[:4] == "FILE":
+                        SEPARATOR = "<SEPARATOR>"
+                        filename, filesize = message[4:].split(SEPARATOR)
+                        receiveFile(message, self.socket)
+
+                        # now send the file again
+                        for client in activeConnections:
+                            if client != self: # send to every client except the one that sent this
+                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                                sendFile(filename, filesize, client.socket)
 
     # create TCP welcoming socket
     serverSocket = socket(AF_INET,SOCK_STREAM)
@@ -44,26 +88,6 @@ if(answer == 'y'):
         newConnection.start()
         activeConnections.append(newConnection)
 
-    #     # read a sentence of bytes from socket sent by the client
-    #     sentence = connectionSocket.recv(1024).decode()
-
-    #     # output to console the sentence received from the client
-    #     print (sentence)
-
-    #     # interactively get user's line to be converted to upper case
-    #     capitalizedSentence = input("")
-        
-    #     # # convert the sentence to upper case
-    #     # capitalizedSentence = sentence.upper()
-        
-    #     # send back modified sentence over the TCP connection
-    #     connectionSocket.send((username + ': ' + capitalizedSentence).encode())
-
-    #     # output to console the sentence sent back to the client
-    #     print (username + ':' + capitalizedSentence)
-        
-    #     # close the TCP connection; the welcoming socket continues
-    # connectionSocket.close()
 else: # client
 
     class Sender(threading.Thread):
@@ -77,7 +101,15 @@ else: # client
                 print('{}: '.format(self.name), end='')
                 sys.stdout.flush()
                 message = sys.stdin.readline()[:-1]
-                self.socket.sendall('{}: {}'.format(self.name, message).encode())
+                if message[0:len("!send ")] == "!send ":
+                    filename = message[len("!send "):]
+                    filesize = os.path.getsize(filename)
+                    SEPARATOR = "<SEPARATOR>"
+                    # send the filename and filesize
+                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                    sendFile(filename, filesize, self.socket)
+                else:
+                    self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
 
     class Receiver(threading.Thread):
         def __init__(self, socket, name):
@@ -88,9 +120,14 @@ else: # client
         def run(self):
             while True:
                 message = self.socket.recv(1024).decode()
-                if message:
-                    print('\r{}\n{}: '.format(message, self.name), end = '')
-                    # print("test")
+                if message[:4] == "TEXT": 
+                    print('\r{}\n{}: '.format(message[4:], self.name), end = '')
+                elif message[:4] == "FILE":
+                    print("Receiving File...")
+                    # SEPARATOR = "<SEPARATOR>"
+                    # filename, filesize = message[4:].split(SEPARATOR)
+                    receiveFile(message, self.socket)
+
                 else:
                     print('\nLost connection to the server.')
                     self.socket.close()
@@ -117,23 +154,3 @@ else: # client
 
     receiver = Receiver(clientSocket, username)
     receiver.start()
-
-
-    # while True:
-    #     # interactively get user's line to be converted to upper case
-    #     sentence = input("")
-
-    #     # send the user's line over the TCP connection
-    #     clientSocket.send((username + ': ' + sentence).encode())
-
-    #     #output to console what is sent to the server
-    #     print (username + ': ' + sentence)
-
-    #     # get user's line back from server having been modified by the server
-    #     modifiedSentence = clientSocket.recv(1024).decode()
-
-    #     # output the modified user's line
-    #     print (modifiedSentence)
-
-    # # close the TCP connection
-    # clientSocket.close()

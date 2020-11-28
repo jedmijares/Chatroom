@@ -5,7 +5,7 @@ import os
 
 answer = input("Will you host? ")
 
-if(answer == 'y'):
+if(answer == 'y'): # begin as server
 
     serverPort = 12000
     activeConnections = []
@@ -23,9 +23,12 @@ if(answer == 'y'):
                 message = (self.socket.recv(1024)).decode()
                 if message:
                     for client in activeConnections:
-                        if client != self:
-                            client.socket.sendall(message.encode())
-
+                        if client != self: # send to every client except the one that sent this
+                            if message[:4] == "TEXT": 
+                                client.socket.sendall(message[4:].encode())
+                            elif message[:4] == "FILE":
+                                client.socket.sendall("File sent.".encode())
+                        
     # create TCP welcoming socket
     serverSocket = socket(AF_INET,SOCK_STREAM)
     serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -63,7 +66,19 @@ else: # client
                     filesize = os.path.getsize(filename)
                     SEPARATOR = "<SEPARATOR>"
                     # send the filename and filesize
-                    self.socket.send(f"{filename}{SEPARATOR}{filesize}".encode())
+                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                    # self.socket.sendall(("FILE").encode())
+                    with open(filename, "rb") as f:
+                        for _ in range(filesize):
+                            # read the bytes from the file
+                            BUFFER_SIZE = 4096 # send 4096 bytes each time step
+                            bytes_read = f.read(BUFFER_SIZE)
+                            if not bytes_read:
+                                # file transmitting is done
+                                break
+                            # we use sendall to assure transimission in 
+                            # busy networks
+                            self.socket.sendall(bytes_read)
                 else:
                     self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
 

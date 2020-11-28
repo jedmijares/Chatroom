@@ -27,8 +27,6 @@ if(answer == 'y'): # begin as server
                             if client != self: # send to every client except the one that sent this
                                 client.socket.sendall(message.encode()) # send message after header
                     elif message[:4] == "FILE":
-                        # receive file
-                        # client.socket.sendall("File sent.".encode())
                         SEPARATOR = "<SEPARATOR>"
                         filename, filesize = message[4:].split(SEPARATOR)
                         # remove absolute path if there is
@@ -38,7 +36,7 @@ if(answer == 'y'): # begin as server
                         with open(filename, "wb") as f:
                             for _ in range(filesize):
                                 BUFFER_SIZE = 1
-                                # read 1024 bytes from the socket (receive)
+                                # read bytes from the socket (receive)
                                 bytes_read = self.socket.recv(BUFFER_SIZE)
                                 if not bytes_read:    
                                     # nothing is received
@@ -46,14 +44,11 @@ if(answer == 'y'): # begin as server
                                     break
                                 # write to the file the bytes we just received
                                 f.write(bytes_read)
-                                # # update the progress bar
-                                # progress.update(len(bytes_read))
 
                         # now send the file again
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
                                 client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
-                                # self.socket.sendall(("FILE").encode())
                                 with open(filename, "rb") as f:
                                     for _ in range(filesize):
                                         # read the bytes from the file
@@ -128,9 +123,6 @@ else: # client
         def run(self):
             while True:
                 message = self.socket.recv(1024).decode()
-                # if message:
-                #     print('\r{}\n{}: '.format(message, self.name), end = '')
-                #     # print("test")
                 if message[:4] == "TEXT": 
                     print('\r{}\n{}: '.format(message[4:], self.name), end = '')
                 elif message[:4] == "FILE":
@@ -144,7 +136,7 @@ else: # client
                     with open(filename, "wb") as f:
                         for _ in range(filesize):
                             BUFFER_SIZE = 1
-                            # read 1024 bytes from the socket (receive)
+                            # read bytes from the socket (receive)
                             bytes_read = self.socket.recv(BUFFER_SIZE)
                             if not bytes_read:    
                                 # nothing is received
@@ -152,8 +144,7 @@ else: # client
                                 break
                             # write to the file the bytes we just received
                             f.write(bytes_read)
-                            # # update the progress bar
-                            # progress.update(len(bytes_read))
+
                 else:
                     print('\nLost connection to the server.')
                     self.socket.close()

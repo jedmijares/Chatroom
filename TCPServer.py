@@ -29,7 +29,7 @@ def decrypt_message(encrypted_message):
 
 def receiveFile(message, mySocket):
     SEPARATOR = "<SEPARATOR>"
-    filename, filesize = message[4:].split(SEPARATOR)
+    filename, filesize, ignore = message[4:].split(SEPARATOR)
     # remove absolute path if there is
     filename = os.path.basename(filename)
     # convert to integer
@@ -83,7 +83,7 @@ if(answer == 'y'): # begin as server
                                 client.socket.sendall(message.encode()) # send message after header
                     elif message[:4] == "FILE":
                         SEPARATOR = "<SEPARATOR>"
-                        filename, filesize = message[4:].split(SEPARATOR)
+                        filename, filesize, ignore = message[4:].split(SEPARATOR)
                         receiveFile(message, self.socket)
 
                         # now send the file again

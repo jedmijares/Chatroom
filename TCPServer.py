@@ -66,7 +66,7 @@ if(answer == 'y'): # begin as server
                         # now send the file again
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
-                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
                                 sendFile(filename, filesize, client.socket)
 
     # create TCP welcoming socket

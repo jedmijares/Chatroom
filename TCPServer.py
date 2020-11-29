@@ -106,7 +106,7 @@ else: # client
                     filesize = os.path.getsize(filename)
                     SEPARATOR = "<SEPARATOR>"
                     # send the filename and filesize
-                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
                     sendFile(filename, filesize, self.socket)
                 else:
                     self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())

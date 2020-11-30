@@ -76,6 +76,7 @@ if(answer == 'y'): # begin as server
                 message = None
                 message = (self.socket.recv(1024)).decode()
                 if message:
+                    print(message)
                     if message[:4] == "TEXT": 
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
@@ -88,7 +89,7 @@ if(answer == 'y'): # begin as server
                         # now send the file again
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
-                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode()) 
                                 sendFile(filename, filesize, client.socket)
 
     # create TCP welcoming socket
@@ -128,7 +129,7 @@ else: # client
                     filesize = os.path.getsize(filename)
                     SEPARATOR = "<SEPARATOR>"
                     # send the filename and filesize
-                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode()) 
                     sendFile(filename, filesize, self.socket)
                 else:
                     message = encrypt_message(message)

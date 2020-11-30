@@ -2,10 +2,12 @@ from socket import *
 import threading
 import sys
 import os
+# from Crypto.Cipher import AES
+import pyaes
 
 answer = input("Will you host? ")
 
-def receiveFile(message, mySocket):
+def receiveFile(message, mySocket, aes = None):
     SEPARATOR = "<SEPARATOR>"
     filename, filesize, ignore = message[4:].split(SEPARATOR)
     # remove absolute path if there is
@@ -24,7 +26,7 @@ def receiveFile(message, mySocket):
             # write to the file the bytes we just received
             f.write(bytes_read)
 
-def sendFile(filename, filesize, mySocket):
+def sendFile(filename, filesize, mySocket, aes = None):
     with open(filename, "rb") as f:
         for _ in range(int(filesize)):
             # read the bytes from the file
@@ -51,14 +53,15 @@ if(answer == 'y'): # begin as server
 
         def run(self):
             while True:
-                message = None
-                message = (self.socket.recv(1024)).decode()
-                if message:
-                    if message[:4] == "TEXT": 
-                        for client in activeConnections:
-                            if client != self: # send to every client except the one that sent this
-                                client.socket.sendall(message.encode()) # send message after header
-                    elif message[:4] == "FILE":
+                # message = None
+                message = (self.socket.recv(1024))
+                if (message != b''):
+                    print("received: ", message)
+                    # try:
+                    #     message = message.decode()
+                    # except UnicodeDecodeError:
+                    #     pass # do nothing
+                    if message[:4] == "FILE":
                         SEPARATOR = "<SEPARATOR>"
                         filename, filesize, ignore = message[4:].split(SEPARATOR)
                         receiveFile(message, self.socket)
@@ -68,6 +71,15 @@ if(answer == 'y'): # begin as server
                             if client != self: # send to every client except the one that sent this
                                 client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
                                 sendFile(filename, filesize, client.socket)
+                    else:
+                    # if message[:4] == "TEXT": 
+                        for client in activeConnections:
+                            if client != self: # send to every client except the one that sent this
+                                # try:
+                                #     message = message.encode()
+                                # except AttributeError:
+                                #     pass # do nothing
+                                client.socket.sendall(message) # send message after header
 
     # create TCP welcoming socket
     serverSocket = socket(AF_INET,SOCK_STREAM)
@@ -91,10 +103,11 @@ if(answer == 'y'): # begin as server
 else: # client
 
     class Sender(threading.Thread):
-        def __init__(self, socket, name):
+        def __init__(self, socket, name, aes = None):
             super().__init__()
             self.socket = socket
             self.name = name
+            self.aes = aes
 
         def run(self):
             while True:
@@ -107,31 +120,41 @@ else: # client
                     SEPARATOR = "<SEPARATOR>"
                     # send the filename and filesize
                     self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
-                    sendFile(filename, filesize, self.socket)
+                    sendFile(filename, filesize, self.socket, self.aes)
                 else:
-                    self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
+                    message = "TEXT" + ('{}: {}'.format(self.name, message))
+                    message = self.aes.encrypt(message)
+                    self.socket.sendall(message)
 
     class Receiver(threading.Thread):
-        def __init__(self, socket, name):
+        def __init__(self, socket, name, aes = None):
             super().__init__()
             self.socket = socket
             self.name = name
+            self.aes = aes
         
         def run(self):
             while True:
-                message = self.socket.recv(1024).decode()
-                if message[:4] == "TEXT": 
-                    print('\r{}\n{}: '.format(message[4:], self.name), end = '')
-                elif message[:4] == "FILE":
-                    print("Receiving File...")
-                    # SEPARATOR = "<SEPARATOR>"
-                    # filename, filesize = message[4:].split(SEPARATOR)
-                    receiveFile(message, self.socket)
-
-                else:
-                    print('\nLost connection to the server.')
-                    self.socket.close()
-                    os._exit(0)
+                message = self.socket.recv(1024)
+                if (message != b''):
+                    # try:
+                    #     message = message.decode()
+                    # except UnicodeDecodeError:
+                    #     pass # do nothing
+                    message = self.aes.decrypt(message)
+                    message = message.decode()
+                    # print(message)
+                    if message[:4] == "TEXT": 
+                        print('\r{}\n{}: '.format(message[4:], self.name), end = '')
+                    elif message[:4] == "FILE":
+                        print("Receiving File...")
+                        # SEPARATOR = "<SEPARATOR>"
+                        # filename, filesize = message[4:].split(SEPARATOR)
+                        receiveFile(message, self.socket, self.aes)
+                    else:
+                        print('\nLost connection to the server.')
+                        self.socket.close()
+                        os._exit(0)
 
     # serverName = '172.17.255.255'
     # serverName = '172.17.0.1'
@@ -149,8 +172,17 @@ else: # client
     username = input("Enter Username: ")
     print()
 
-    sender = Sender(clientSocket, username)
+    useEncryption = input("Use Encryption? (y/n) ")
+    print()
+    aes = None
+    if (useEncryption == 'y'):
+        encryptionKey = input("Enter 16 byte encryption key: ")
+        print()
+        aes = pyaes.AESModeOfOperationCTR(encryptionKey.encode())
+
+
+    sender = Sender(clientSocket, username, aes)
     sender.start()
 
-    receiver = Receiver(clientSocket, username)
+    receiver = Receiver(clientSocket, username, aes)
     receiver.start()

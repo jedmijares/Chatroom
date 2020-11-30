@@ -6,25 +6,17 @@ import os
 
 answer = input("Will you host? ")
 
-#key = open("secret.txt", "rb").read()
-key = 'MWwHhv8mDWBnuToB3uuV-5ISttlhzn1Dypb9KdiQOFI='
-#encoding stuff. Key is already generated in "secret.txt"
+#example_key = 'MWwHhv8mDWBnuToB3uuV-5ISttlhzn1Dypb9KdiQOFI='
 
-#def load_key():
-    #return open("secret.txt", "rb").read()
-
-def encrypt_message(message, user_key):
-    #key = load_key()
+def encrypt(message, user_key):
     encoded_message = message.encode()
-    f = Fernet(user_key)
-    encrypted_message = f.encrypt(encoded_message)
+    cipher = Fernet(user_key)
+    encrypted_message = cipher.encrypt(encoded_message)
     return encrypted_message
 
-def decrypt_message(encrypted_message, user_key):
-    #key = load_key()
-    f = Fernet(user_key)
-    decrypted_message = f.decrypt(encrypted_message)
-
+def decrypt(encrypted_message, user_key):
+    cipher = Fernet(user_key)
+    decrypted_message = cipher.decrypt(encrypted_message)
     return decrypted_message.decode('utf-8')
 
 def receiveFile(message, mySocket):
@@ -132,7 +124,7 @@ else: # client
                     self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode()) 
                     sendFile(filename, filesize, self.socket)
                 else:
-                    message = encrypt_message(message, user_key)  #comment this line to display wireshark functionality
+                    message = encrypt(message, user_key)  #comment this line to display wireshark functionality
                     self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
 
     class Receiver(threading.Thread):
@@ -147,11 +139,11 @@ else: # client
                 if message[:4] == "TEXT": 
                     index = message.find("b'")
                     changed = message[index+2:].encode('utf-8')
-                    #print(changed)
-                    new_message = decrypt_message(changed, user_key)
-                    #print(new_message)
+                    try:
+                        new_message = decrypt(changed, user_key)
+                    except: # error is thrown here when encryption keys between users does not match
+                        new_message = "ERROR: ENCRYPTION KEY IS DIFFERENT"
                     print('\r{}\n{}: '.format(message[4:index-1] + " " + new_message, self.name), end = '')
-                    #print('\r{}\n{}: '.format(new_message, self.name), end = '')
                 elif message[:4] == "FILE":
                     print("Receiving File...")
                     # SEPARATOR = "<SEPARATOR>"
@@ -177,7 +169,6 @@ else: # client
     clientSocket.connect((serverName,serverPort))
 
     username = input("Enter Username: ")
-    print()
     user_key = input("Enter encryption key: ")
     print()
 

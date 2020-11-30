@@ -7,7 +7,7 @@ answer = input("Will you host? ")
 
 def receiveFile(message, mySocket):
     SEPARATOR = "<SEPARATOR>"
-    filename, filesize = message[4:].split(SEPARATOR)
+    filename, filesize, ignore = message[4:].split(SEPARATOR)
     # remove absolute path if there is
     filename = os.path.basename(filename)
     # convert to integer
@@ -60,13 +60,13 @@ if(answer == 'y'): # begin as server
                                 client.socket.sendall(message.encode()) # send message after header
                     elif message[:4] == "FILE":
                         SEPARATOR = "<SEPARATOR>"
-                        filename, filesize = message[4:].split(SEPARATOR)
+                        filename, filesize, ignore = message[4:].split(SEPARATOR)
                         receiveFile(message, self.socket)
 
                         # now send the file again
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
-                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
                                 sendFile(filename, filesize, client.socket)
 
     # create TCP welcoming socket
@@ -106,7 +106,7 @@ else: # client
                     filesize = os.path.getsize(filename)
                     SEPARATOR = "<SEPARATOR>"
                     # send the filename and filesize
-                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
+                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
                     sendFile(filename, filesize, self.socket)
                 else:
                     self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())

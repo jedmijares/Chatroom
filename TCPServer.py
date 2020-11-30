@@ -144,11 +144,13 @@ else: # client
             while True:
                 message = self.socket.recv(1024).decode()
                 if message[:4] == "TEXT": 
-                    changed = message.split(" ")
-                    #print(changed[1])
-                    #new_message = decrypt_message(changed[1])
+                    index = message.find("b'")
+                    changed = message[index+2:].encode('utf-8')
+                    #print(changed)
+                    new_message = decrypt_message(changed)
                     #print(new_message)
-                    print('\r{}\n{}: '.format(message[4:], self.name), end = '')
+                    print('\r{}\n{}: '.format(message[4:index-1] + " " + new_message, self.name), end = '')
+                    #print('\r{}\n{}: '.format(new_message, self.name), end = '')
                 elif message[:4] == "FILE":
                     print("Receiving File...")
                     # SEPARATOR = "<SEPARATOR>"

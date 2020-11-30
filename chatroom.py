@@ -1,5 +1,5 @@
 from socket import *
-from cryptography.fernet import Fernet # pip install cryptography
+from cryptography.fernet import Fernet
 import threading
 import sys
 import os

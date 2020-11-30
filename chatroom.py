@@ -157,20 +157,26 @@ else: # client
 
     # serverName = '172.17.255.255'
     # serverName = '172.17.0.1'
-    serverName = 'localhost' # Jed IP
-    #serverName = '198.232.126.35' # Andrew IP
-    # serverName = '172.17.255.255'
+    # serverName = 'localhost' # Jed IP
+    # #serverName = '198.232.126.35' # Andrew IP
+    # # serverName = '172.17.255.255'
     serverPort = 12000
+
+    serverName = input("Enter IP address to connect to (leave blank to connect via localhost) ")
+    if serverName == '':
+        serverName = 'localhost'
+    
+    # serverPort = input("Enter serverPort to connect to (10000 default) ")
+    # if serverPort == '':
+    #     serverPort = '10000'
+    username = input("Enter Username: ")
+    user_key = input("Enter encryption key: ")
 
     # create TCP socket on client to use for connecting to remote server.  
     clientSocket = socket(AF_INET, SOCK_STREAM)
 
     # open the TCP connection
     clientSocket.connect((serverName,serverPort))
-
-    username = input("Enter Username: ")
-    user_key = input("Enter encryption key: ")
-    print()
 
     sender = Sender(clientSocket, username)
     sender.start()

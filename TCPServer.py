@@ -1,9 +1,23 @@
 from socket import *
+from cryptography.fernet import Fernet # pip install cryptography
 import threading
 import sys
 import os
 
 answer = input("Will you host? ")
+
+#example_key = 'MWwHhv8mDWBnuToB3uuV-5ISttlhzn1Dypb9KdiQOFI='
+
+def encrypt(message, user_key):
+    encoded_message = message.encode()
+    cipher = Fernet(user_key)
+    encrypted_message = cipher.encrypt(encoded_message)
+    return encrypted_message
+
+def decrypt(encrypted_message, user_key):
+    cipher = Fernet(user_key)
+    decrypted_message = cipher.decrypt(encrypted_message)
+    return decrypted_message.decode('utf-8')
 
 def receiveFile(message, mySocket):
     SEPARATOR = "<SEPARATOR>"
@@ -54,6 +68,7 @@ if(answer == 'y'): # begin as server
                 message = None
                 message = (self.socket.recv(1024)).decode()
                 if message:
+                    print(message)
                     if message[:4] == "TEXT": 
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
@@ -66,7 +81,7 @@ if(answer == 'y'): # begin as server
                         # now send the file again
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
-                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
+                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode()) 
                                 sendFile(filename, filesize, client.socket)
 
     # create TCP welcoming socket
@@ -106,9 +121,10 @@ else: # client
                     filesize = os.path.getsize(filename)
                     SEPARATOR = "<SEPARATOR>"
                     # send the filename and filesize
-                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
+                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode()) 
                     sendFile(filename, filesize, self.socket)
                 else:
+                    message = encrypt(message, user_key)  #comment this line to display wireshark functionality
                     self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
 
     class Receiver(threading.Thread):
@@ -121,7 +137,13 @@ else: # client
             while True:
                 message = self.socket.recv(1024).decode()
                 if message[:4] == "TEXT": 
-                    print('\r{}\n{}: '.format(message[4:], self.name), end = '')
+                    index = message.find("b'")
+                    changed = message[index+2:].encode('utf-8')
+                    try:
+                        new_message = decrypt(changed, user_key)
+                    except: # error is thrown here when encryption keys between users does not match
+                        new_message = "ERROR: ENCRYPTION KEY IS DIFFERENT"
+                    print('\r{}\n{}: '.format(message[4:index-1] + " " + new_message, self.name), end = '')
                 elif message[:4] == "FILE":
                     print("Receiving File...")
                     # SEPARATOR = "<SEPARATOR>"
@@ -147,6 +169,7 @@ else: # client
     clientSocket.connect((serverName,serverPort))
 
     username = input("Enter Username: ")
+    user_key = input("Enter encryption key: ")
     print()
 
     sender = Sender(clientSocket, username)

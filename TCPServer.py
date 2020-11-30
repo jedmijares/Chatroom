@@ -1,13 +1,35 @@
 from socket import *
+from cryptography.fernet import Fernet # pip install cryptography
 import threading
 import sys
 import os
 
 answer = input("Will you host? ")
 
+#key = open("secret.txt", "rb").read()
+key = 'MWwHhv8mDWBnuToB3uuV-5ISttlhzn1Dypb9KdiQOFI='
+#encoding stuff. Key is already generated in "secret.txt"
+
+#def load_key():
+    #return open("secret.txt", "rb").read()
+
+def encrypt_message(message):
+    #key = load_key()
+    encoded_message = message.encode()
+    f = Fernet(key)
+    encrypted_message = f.encrypt(encoded_message)
+    return encrypted_message
+
+def decrypt_message(encrypted_message):
+    #key = load_key()
+    f = Fernet(key)
+    decrypted_message = f.decrypt(encrypted_message)
+
+    return decrypted_message.decode('utf-8')
+
 def receiveFile(message, mySocket):
     SEPARATOR = "<SEPARATOR>"
-    filename, filesize, ignore = message[4:].split(SEPARATOR)
+    filename, filesize = message[4:].split(SEPARATOR)
     # remove absolute path if there is
     filename = os.path.basename(filename)
     # convert to integer
@@ -60,13 +82,13 @@ if(answer == 'y'): # begin as server
                                 client.socket.sendall(message.encode()) # send message after header
                     elif message[:4] == "FILE":
                         SEPARATOR = "<SEPARATOR>"
-                        filename, filesize, ignore = message[4:].split(SEPARATOR)
+                        filename, filesize = message[4:].split(SEPARATOR)
                         receiveFile(message, self.socket)
 
                         # now send the file again
                         for client in activeConnections:
                             if client != self: # send to every client except the one that sent this
-                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
+                                client.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
                                 sendFile(filename, filesize, client.socket)
 
     # create TCP welcoming socket
@@ -106,9 +128,10 @@ else: # client
                     filesize = os.path.getsize(filename)
                     SEPARATOR = "<SEPARATOR>"
                     # send the filename and filesize
-                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode())
+                    self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}").encode())
                     sendFile(filename, filesize, self.socket)
                 else:
+                    message = encrypt_message(message)
                     self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
 
     class Receiver(threading.Thread):
@@ -121,6 +144,10 @@ else: # client
             while True:
                 message = self.socket.recv(1024).decode()
                 if message[:4] == "TEXT": 
+                    changed = message.split(" ")
+                    #print(changed[1])
+                    #new_message = decrypt_message(changed[1])
+                    #print(new_message)
                     print('\r{}\n{}: '.format(message[4:], self.name), end = '')
                 elif message[:4] == "FILE":
                     print("Receiving File...")

@@ -13,16 +13,16 @@ key = 'MWwHhv8mDWBnuToB3uuV-5ISttlhzn1Dypb9KdiQOFI='
 #def load_key():
     #return open("secret.txt", "rb").read()
 
-def encrypt_message(message):
+def encrypt_message(message, user_key):
     #key = load_key()
     encoded_message = message.encode()
-    f = Fernet(key)
+    f = Fernet(user_key)
     encrypted_message = f.encrypt(encoded_message)
     return encrypted_message
 
-def decrypt_message(encrypted_message):
+def decrypt_message(encrypted_message, user_key):
     #key = load_key()
-    f = Fernet(key)
+    f = Fernet(user_key)
     decrypted_message = f.decrypt(encrypted_message)
 
     return decrypted_message.decode('utf-8')
@@ -132,7 +132,7 @@ else: # client
                     self.socket.sendall(("FILE" + f"{filename}{SEPARATOR}{filesize}{SEPARATOR}").encode()) 
                     sendFile(filename, filesize, self.socket)
                 else:
-                    message = encrypt_message(message)
+                    message = encrypt_message(message, user_key)  #comment this line to display wireshark functionality
                     self.socket.sendall(("TEXT" + ('{}: {}'.format(self.name, message))).encode())
 
     class Receiver(threading.Thread):
@@ -148,7 +148,7 @@ else: # client
                     index = message.find("b'")
                     changed = message[index+2:].encode('utf-8')
                     #print(changed)
-                    new_message = decrypt_message(changed)
+                    new_message = decrypt_message(changed, user_key)
                     #print(new_message)
                     print('\r{}\n{}: '.format(message[4:index-1] + " " + new_message, self.name), end = '')
                     #print('\r{}\n{}: '.format(new_message, self.name), end = '')
@@ -177,6 +177,8 @@ else: # client
     clientSocket.connect((serverName,serverPort))
 
     username = input("Enter Username: ")
+    print()
+    user_key = input("Enter encryption key: ")
     print()
 
     sender = Sender(clientSocket, username)

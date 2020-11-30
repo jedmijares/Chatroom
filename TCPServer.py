@@ -79,6 +79,8 @@ if(answer == 'y'): # begin as server
                                 #     message = message.encode()
                                 # except AttributeError:
                                 #     pass # do nothing
+                                if type(message) is str:
+                                    message = message.encode()
                                 client.socket.sendall(message) # send message after header
 
     # create TCP welcoming socket
@@ -123,7 +125,10 @@ else: # client
                     sendFile(filename, filesize, self.socket, self.aes)
                 else:
                     message = "TEXT" + ('{}: {}'.format(self.name, message))
-                    message = self.aes.encrypt(message)
+                    if self.aes:
+                        message = self.aes.encrypt(message)
+                    else:
+                        message = message.encode()  
                     self.socket.sendall(message)
 
     class Receiver(threading.Thread):
@@ -141,7 +146,8 @@ else: # client
                     #     message = message.decode()
                     # except UnicodeDecodeError:
                     #     pass # do nothing
-                    message = self.aes.decrypt(message)
+                    if self.aes:
+                        message = self.aes.decrypt(message)
                     message = message.decode()
                     # print(message)
                     if message[:4] == "TEXT": 

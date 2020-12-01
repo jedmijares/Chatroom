@@ -28,7 +28,7 @@ def receiveFile(message, mySocket):
     filesize = int(filesize)
     with open(filename, "wb") as f:
         for _ in range(filesize):
-            BUFFER_SIZE = 1
+            BUFFER_SIZE = 1024
             # read bytes from the socket (receive)
             bytes_read = mySocket.recv(BUFFER_SIZE)
             if not bytes_read:    
@@ -42,7 +42,7 @@ def sendFile(filename, filesize, mySocket):
     with open(filename, "rb") as f:
         for _ in range(int(filesize)):
             # read the bytes from the file
-            BUFFER_SIZE = 1 # send 4096 bytes each time step
+            BUFFER_SIZE = 1024 # send 4096 bytes each time step
             bytes_read = f.read(BUFFER_SIZE)
             if not bytes_read:
                 # file transmitting is done

@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+
+\bibitem{Authors12}
+Authors,
+\newblock ``The frobnicatable foo filter,'' ACM MM 2013 submission ID 324.
+  Supplied as additional material {\tt acmmm13.pdf}.
+
+\bibitem{Authors12b}
+Authors,
+\newblock ``Frobnication tutorial,'' 2012,
+\newblock Supplied as additional material {\tt tr.pdf}.
+
+\bibitem{Morgan2005}
+Dennis~R. Morgan,
+\newblock ``Dos and don'ts of technical writing,''
+\newblock {\em IEEE Potentials}, vol. 24, no. 3, pp. 22--25, Aug. 2005.
+
+\bibitem{cooley65}
+J.~W. Cooley and J.~W. Tukey,
+\newblock ``An algorithm for the machine computation of complex {F}ourier
+  series,''
+\newblock {\em Math. Comp.}, vol. 19, pp. 297--301, Apr. 1965.
+
+\bibitem{haykin02}
+S.~Haykin,
+\newblock ``Adaptive filter theory,''
+\newblock Information and System Science. Prentice Hall, 4th edition, 2002.
+
+\end{thebibliography}

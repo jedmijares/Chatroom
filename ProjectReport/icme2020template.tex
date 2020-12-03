@@ -48,45 +48,42 @@ One, two, three, four, five
 %
 \section{Introduction}
 \label{sec:intro}
+A critical function of the internet has always been allowing people to communicate with each other remotely. This has been especially relevant this year, as it is more difficult to meet with people in person. Due to this, the group decided to create a chatroom application to explore this area firsthand. 
 
-These guidelines include complete descriptions of the fonts, spacing, and related information for producing your proceedings manuscripts. Please follow them. If you have any questions, direct them to info.icme2020@qmul.ac.uk .
+\subsection{Relevance to the Course}
 
-\subsection{Language}
+(Should the textbook be cited somehow?)
+The project most heavily builds on the content in Chapter 2 of the textbook. Specifically, the topics that were used are programming with sockets and sending messages or files back and forth. 
 
-All manuscripts must be in English.
+This project also relates to the material from Chapter 8. These topics are security and end-to-end encryption. 
 
-\subsection{Paper length}
+Getting experience with these concepts helped to understand and reinforce the real-world applications where they are used. For example, seeing the effect that no encryption has on the security of the messages. Without any security, the messages could be easily intercepted and read with a packet sniffer such as Wireshark. Another example is splitting a large file into smaller chunks before sending. While this concept is learned early in this course, the act of actually programming and using this technique reinforces the concept.
 
-Papers should be no longer than 6 pages, including all text, figures, and references.
+\subsection{Comparison to Internet Relay Chat (IRC)}
 
-\subsection{Supplemental material}
+Include the graphic from slide 4 of the slides! I need to learn how to do this. 
 
-Authors may optionally upload supplemental material. Typically, this material might include:
-\begin{itemize}
-  \item a short presentation summarizing the paper,
-  \item videos of results that cannot be included in the main paper,
-  \item screen recording of the running program
-  \item anonymized related submissions to other conferences and journals, and
-  \item appendices or technical reports containing extended proofs and mathematical derivations that are not essential for understanding of the paper.
-\end{itemize}
+Internet Relay Chat (IRC), the first popularized open chat protocol (but not the first!) was invented in 1988 and still has users today. This is due to its...
 
-Note that the contents of the supplemental material should be referred to appropriately in the paper and that reviewers are not obliged to look at it.
+Similar to our protocol, it operates on a client server scheme. Anybody who properly implements the protocol can connect to or create a server. 
 
-All supplemental material must be zipped into a single file. There is a 20MB limit on the size of this file.
+Our protocol adds some features present in proprietary chat applications that are not available in "vanilla" IRC. (Though some users have created IRC extensions that add similar functions.)
 
-\subsection{Dual submission}
+Other open chat examples are XMPP and PSYC. 
 
-By submitting a manuscript to ICME, the authors guarantee that it has not been previously published (or accepted for publication) in substantially similar form. Furthermore, no paper which contains significant overlap with the contributions of this paper either has been or will be submitted during the ICME 2020 review period to either a journal or a conference.
+\subsection{Comparison to Proprietary Applications}
 
-If there are papers that may appear to violate any of these conditions, then it is the authors' responsibility to (1) cite these papers (preserving anonymity as described in Section 2 of this example paper), (2) argue in the body of your paper why your ICME paper is nontrivially different from these concurrent submissions, and (3) include anonymized versions of those papers in the supplemental material.
+Services such as Slack, Discord, and GroupMe are products offered that also offer chat applications. 
 
-\section{Blind Review}
+These applications are often robust and offer features that cater to a certain target market. For example, Slack is geared towards a professional work environment while Discord is designed for video game players to communicate. 
 
-Many authors misunderstand the concept of anonymizing for blind review. Blind review does not mean that one must remove citations to one's own work-in fact it is often impossible to review a paper unless the previous citations are known and available.
+Unlike IRC and the chatroom application created for this project, these proprietary applications offer a standard client to use their service. It is not possible (or legal) to create a custom client to connect to these applications. However, some may offer Application Programming Interfaces (API) for people to create some sort of interface, such as bots. 
 
-Blind review means that you do not use the words ``my'' or ``our'' when citing previous work. That is all. (But see below for technical reports)
+\section{Approach Description}
 
-Saying ``this builds on the work of Lucy Smith [1]'' does not say that you are Lucy Smith, it says that you are building on her work. If you are Smith and Jones, do not say ``as we show in [7]'', say ``as Smith and Jones show in [7]''and at the end of the paper, include reference 7 as you would any other cited work.
+Will describe goals of project, as well as show and describe flow charts. Keeping some of the fluff below in case we want to use any of these. We could use them as examples. 
+
+Also kept the next long blurb so that I can copy/paste the formatting for quotes and such at some point. 
 
 An example of a bad paper:
 \begin{quote}
@@ -129,8 +126,6 @@ Finally, you may feel you need to tell the reader that more details can be found
 submissions, the paper must stand on its own, and not {\em require} the reviewer to go to a technical report for further details. Thus, you may say in
 the body of the paper ``further details may be found in~\cite{Authors12b}''.  Then submit the technical report as additional material. Again, you may not assume the reviewers will read this material.
 
-Sometimes your paper is about a problem which you tested using a tool which is widely known to be restricted to a single institution.  For example, let's say it's 1969, you have solved a key problem on the Apollo lander, and you believe that the ICME audience would like to hear about your solution.  The work is a development of your celebrated 1968 paper entitled ``Zero-g frobnication: How being the only people in the world with access to the Apollo lander source code makes us a wow at parties'', by Zeus.
-
 You can handle this paper like any other.  Don't write ``We show how to improve our previous work [Anonymous, 1968].  This time we tested the algorithm on a lunar lander [name of lander removed for blind review]''. That would be silly, and would immediately identify the authors. Instead write the following:
 \begin{quotation}
 \noindent
@@ -148,21 +143,40 @@ You can handle this paper like any other.  Don't write ``We show how to improve 
    which show how well we solved cases A and B: ...
 \end{quotation}
 
-As you can see, the above text follows standard scientific convention, reads better than the first version, and does not explicitly name you as the authors. A reviewer might think it likely that the new paper was written by Zeus, but cannot make any decision based on that guess. He or she would have to be sure that no other authors could have been contracted to solve problem B.
+\section{Design Points}
 
-FAQ: Are acknowledgements OK?  No. Please omit them in the review copy and leave them for the final, camera ready copy.
+A subsection for threading, encryption, and file sharing here. Show all of our pictures and find some way to incorporate our videos. 
 
-\section{Formatting Your Paper}
+\subsection{Threading}
 
-All printed material, including text, illustrations, and charts, must be kept within a print area of 7 inches (178 mm) wide by 9 inches (229 mm) high. Do not write or print anything outside the print area. The top margin must be 1 inch (25 mm), except for the title page, and the left margin must be 0.75 inch (19 mm).  All text must be in a two-column format. Columns are to be 3.39 inches (86 mm) wide, with a 0.24 inch (6 mm) space between them. Text must be fully justified.
+The most impressive part of the project, in my opinion. 
 
-\section{Page Title Section}
+\subsection{Encryption}
 
-The paper title (on the first page) should begin 1.38 inches (35 mm) from the top edge of the page, centered, completely capitalized, and in Times 14-point, boldface type.  The authors' name(s) and affiliation(s) appear below the title in capital and lower case letters.  Papers with multiple authors and affiliations may require two or more lines for this information.
+Used a form of AES encryption, blah blah
 
-\section{Type-Style and Fonts}
+\subsection{File Sharing}
 
-To achieve the best rendering both in the proceedings and from the CD-ROM, we strongly encourage you to use Times-Roman font. In addition, this will give the proceedings a more uniform look. Use a font that is no smaller than nine point type throughout the paper, including figure captions.
+Got these to add how I wanted them to, nice. 
+
+\section{Division of Labor}
+
+Jed: Multi-threaded chat program, file transfer, and code flowcharts. 
+
+Andrew: Encryption, encryption Wireshark experiment. 
+
+\section{Conclusion}
+
+To summarize, the project successfully completed all of our goals. We created a TCP chatroom program that is similar to IRC, while providing some extra features. 
+
+Given more time, the next set of objectives would be as follows: 
+\begin{itemize}
+  \item Caching messages
+  \item Private messages
+  \item Improving robustness/error handling
+  \item improved user interface, and
+  \item Encryption/decryption of files. 
+\end{itemize}
 
 If you use the smallest point size, there should be no more than 3.2 lines/cm (8 lines/inch) vertically. This is a minimum spacing; 2.75 lines/cm (7 lines/inch) will make the paper much more readable. Larger type sizes require correspondingly larger vertical spacing. Please do not double-space your paper. True-Type 1 fonts are preferred.
 

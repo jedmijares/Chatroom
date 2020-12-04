@@ -124,9 +124,3 @@ dmypy.json
 .pyre/
 
 .vscode/
-
-*.png
-
-*.svg
-
-*.jpg

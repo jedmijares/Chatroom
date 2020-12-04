@@ -54,6 +54,13 @@
 \label{sec:intro}
 A critical function of the internet has always been allowing people to communicate with each other remotely. This has been especially relevant this year, as it is more difficult to meet with people in person as a result of the COVID-19 pandemic. Due to this, the group decided to create a chatroom application to explore this area firsthand. 
 
+\begin{figure}[h]
+\caption{Demonstration of clients chatting via our chatroom application}
+\centering
+\includegraphics[width=0.5\textwidth]{media/usersChatting.PNG}
+\label{usersChatting}
+\end{figure}
+
 \subsection{Relevance to the Course}
 
 The project most heavily builds on the content in Chapter 2 of Kurose's textbook, \emph{Computer Networking} \cite{kurose}. Specifically, the topics that were used are programming with sockets and sending messages or files back and forth. 
@@ -196,7 +203,14 @@ As mentioned previously, the user may send a file located on their device with "
 
 When the server receives the "FILE" header message, it first parses the given file name and size. Then, it opens a file with the given file name and begins to write the data sent from the client into that file. Once complete, it sends the file to each connected client, just as the client sent it to the server. This process is shown in Figure \ref{server1}.
 
-Finally, the receiving clients receives the "FILE" message and file data from the server, as shown in Figure \ref{client3}. The user is able to use the file as they wish.
+Finally, the receiving clients receives the "FILE" message and file data from the server, as shown in Figure \ref{client3}. The user is able to use the file as they wish. A practical use of this feature is shown in Figure \ref{fileshareDemo}.
+
+\begin{figure}[h]
+\centering
+\caption{Demonstration of filesharing application}
+\includegraphics[width=0.5\textwidth]{media/fileshareDemo.png}
+\label{fileshareDemo}
+\end{figure}
 
 Unlike text messages, files are not currently encrypted. Other potential improvements to this feature that could be added in the future include error handling if a file is not present, parallelizing the sending of the file, and automatically displaying the file in the receiver's default application for the given file type.
 
@@ -211,10 +225,22 @@ Unlike text messages, files are not currently encrypted. Other potential improve
 \caption{Results of Encryption on Legibility of Wireshark Captures. The capture on the left is from an encrypted message, while the capture on the right is from a non-encrypted message. The capture on the left is illegible, while the non-encrypted capture can be read directly.}
 \end{figure*}
 
-Two tests were run to make sure that the encryption method was actually working. First, the effectiveness of encryption was shown in the chatroom itself. To make sure that the encryption method actually prevented users from
+Two tests were run to make sure that the encryption method was actually working. First, the effectiveness of encryption was shown in the chatroom itself. To make sure that the encryption method actually prevented users with different encryption keys from viewing each other's messages, three clients were connected to a localhost server. Two of these clients have equivalent encryption keys, while the third user has a different key. If the encryption method works correctly, the two users with equivalent keys will be able to read each other's messages, while the third user will only see the error message described in section 3.2. Similarly, the two users should not be able to read the messages from the third user with a different key. 
+
+The results of this experiment are shown in Figure \ref{Encryption Results Figure}. The clients with usernames "Andrew" and "Jed" both have the same encryption key, while "random guy" has a different key. As expected, the users Andrew and Jed were able to read each other's messages, while Random guy could only see an error code. Additionally, users Andrew and Jed could not read the messages that Random guy sent. 
+
+The purpose of the second experiment is to 
+
+\begin{figure}[h]
+\centering
+\caption{Results of the first experiment to show the effectiveness of encryption.}
+\includegraphics[width=0.5\textwidth]{media/EncryptionExperiment.PNG}
+\label{Encryption Results Figure}
+
+\end{figure}
 
 \subsection{File Sharing}
-We found we were successfully able to send files from one computer to another. However, we noticed that the received files may have slight errors in transmission. For example, pictures might send, but have a small gray rectangle near the bottom. It seems something in the code may have been cutting off the transmission early for larger files, but we were not able to fully debug this issue. So, while this application may be sufficient casual sending of files such as images and text documents, it can fail for more complex files.
+We found we were successfully able to send files from one computer to another. However, we noticed that the received files sometimes had slight errors in transmission. For example, pictures might send, but have a small gray rectangle near the bottom. It seems something in the code may have been cutting off the transmission early for larger files, but we were not able to fully debug this issue. So, while this application may be sufficient casual sending of files such as images and text documents, it can fail for more complex files.
 
 % \section{Discussions on Results}
 
@@ -228,6 +254,7 @@ Jed -
   \item File transfer
   \item Code flowcharts
 \end{itemize}
+
 Andrew - 
 \begin{itemize}
   \item Encryption

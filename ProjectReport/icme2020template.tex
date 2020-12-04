@@ -67,11 +67,16 @@ Getting experience with these concepts helped to understand and reinforce the re
 
 \subsection{Comparison to Internet Relay Chat (IRC)}
 
-% Include the graphic from slide 4 of the slides! I need to learn how to do this. 
+\begin{figure}[h]
+\caption{IRC Network Architecture Diagram}
+\centering
+\includegraphics[width=0.5\textwidth]{media/Network.PNG}
+\label{Network Architecture}
+\end{figure}
 
 Internet Relay Chat (IRC), the first popularized open chat protocol (but not the first!) was invented in 1988 and still has users today. This is due to its...
 
-Similar to our protocol, it operates on a client server scheme. Anybody who properly implements the protocol can connect to or create a server. 
+Similar to our protocol, it operates on a client server scheme, as shown in Figure \ref{Network Architecture}. Anybody who properly implements the protocol can connect to or create a server. 
 
 Our protocol adds some features present in proprietary chat applications that are not available in "vanilla" IRC. (Though some users have created IRC extensions that add similar functions.)
 
@@ -84,6 +89,18 @@ Services such as Slack, Discord, and GroupMe are products offered that also offe
 These applications are often robust and offer features that cater to a certain target market. For example, Slack is geared towards a professional work environment while Discord is designed for video game players to communicate. 
 
 Unlike IRC and the chatroom application created for this project, these proprietary applications offer a standard client to use their service. It is not possible (or legal) to create a custom client to connect to these applications. However, some may offer Application Programming Interfaces (API) for people to create some sort of interface, such as bots. 
+
+\subsection{Types of Encryption}
+
+Encryption is a necessary aspect of chatroom applications; one that developers must keep in mind while creating applications. Without sufficient encryption, malicious onlookers will not only have the potential to read messages sent between users, but also to obtain personal information, such as passwords. One key aspect of our project is to begin developing our chatroom's encryption methods, beginning with the encryption of chat messages. 
+
+One of the most trusted encryption techniques is the Advanced Encryption Standard (AES). AES is the encryption standard used by the United States government, banks, and many other corporations where encryption is massively important. One pro of AES are its use of "symmetric encryption", meaning that the same key that is used for encryption is also used for decryption. Another pro is that the large key sizes used by AES (supports 128, 192, and 256 bits) makes hacking encrypted data virtually impossible. The con of this method, however, is that AES encrypts in blocks of 128 bits, which can lead to a time consuming and memory intensive encryption and decryption process for very large files. 
+
+Since text messages make up the majority of communication in our chatroom application, the pros of robust security and simple implementation outweigh the cons of time and memory intensiveness. 
+
+Other options that were considered for this project were Salsa20 and Data Encryption Standard (DES). Both of these options were quickly ruled out in favor of AES. While Salsa20 has the potential to provide faster encryption times on large files, its use is not near as documented and established as AES. DES is a more well known encryption standard, but its short key length of 56 bits makes it much easier to crack. 
+
+\subsection{Architecture Options}
 
 \section{Technical Approach Description}
 

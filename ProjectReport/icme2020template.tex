@@ -4,7 +4,7 @@
 % --------------------------------------------------------------------------
 \documentclass{article}
 \usepackage{spconf,amsmath,epsfig}
-\usepackage{svg}
+% \usepackage{svg}
 
 \let\OLDthebibliography\thebibliography
 \renewcommand\thebibliography[1]{
@@ -18,10 +18,10 @@
 
 \begin{document}\sloppy
 
-% Example definitions.
-% --------------------
-\def\x{{\mathbf x}}
-\def\L{{\cal L}}
+% % Example definitions.
+% % --------------------
+% \def\x{{\mathbf x}}
+% \def\L{{\cal L}}
 
 
 % Title.
@@ -67,7 +67,7 @@ Getting experience with these concepts helped to understand and reinforce the re
 
 \subsection{Comparison to Internet Relay Chat (IRC)}
 
-Include the graphic from slide 4 of the slides! I need to learn how to do this. 
+% Include the graphic from slide 4 of the slides! I need to learn how to do this. 
 
 Internet Relay Chat (IRC), the first popularized open chat protocol (but not the first!) was invented in 1988 and still has users today. This is due to its...
 
@@ -210,11 +210,22 @@ Finally, the code describing the receiving of messages is described in Figure \r
 
 \subsection{File Sharing}
 
-% Got these to add how I wanted them to, nice. 
+As mentioned previously, the user may send a file located on their device with "!send \emph{filename}". When this occurs, the client first sends a short message with the header "FILE" (as opposed to the "TEXT" of a general chat message). This initial message contains the file's name and its size. After sending this message, the client begins sending the file sequentially, until the entire file has been sent. This process is shown in Figure \ref{client1}.
 
-\section{Experimental Results}
+When the server receives the "FILE" header message, it first parses the given file name and size. Then, it opens a file with the given file name and begins to write the data sent from the client into that file. Once complete, it sends the file to each connected client, just as the client sent it to the server. This process is shown in Figure \ref{server1}.
 
-\section{Discussions on Results}
+Finally, the receiving clients receives the "FILE" message and file data from the server, as shown in Figure \ref{client3}. The user is able to use the file as they wish.
+
+Unlike text messages, files are not currently encrypted. Other potential improvements to this feature that could be added in the future include error handling if a file is not present, parallelizing the sending of the file, and automatically displaying the file in the receiver's default application for the given file type.
+
+\section{Experimental Results and Discussion}
+
+\subsection{Encryption}
+
+\subsection{File Sharing}
+We found we were successfully able to send files from one computer to another. However, we noticed that the received files may have slight errors in transmission. For example, pictures might send, but have a small gray rectangle near the bottom. It seems something in the code may have been cutting off the transmission early for larger files, but we were not able to fully debug this issue. So, while this application may be sufficient casual sending of files such as images and text documents, it can fail for more complex files.
+
+% \section{Discussions on Results}
 
 \section{Division of Labor}
 

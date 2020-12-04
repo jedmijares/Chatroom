@@ -153,7 +153,7 @@ Unlike IRC and the chatroom application created for this project, these propriet
 
 % A subsection for threading, encryption, and file sharing here. Show all of our pictures and find some way to incorporate our videos. 
 
-\subsection{Threading}
+\subsection{Threaded Chat Program}
 
 At first, we approached the challenge with a simple procedural program on each end of the chatroom. We quickly found this was insufficient - users could indeed communicate with each other, but only if they took turns sending messages to each other. Otherwise the program would hang, not allowing the user to continue to send messages until they had received one.
 
@@ -163,21 +163,54 @@ To solve the problem, we redirected the chatroom program using a multi-threaded 
 \caption{Beginning of Server Code}
 \centering
 \includegraphics[width=0.5\textwidth]{media/serverFlowchart2.png}
+\label{server2}
 \end{figure}
 
+When the user decides to create a new server on their device, the program first creates a socket to handle new connections, then waits for clients to connect, as demonstrated in Figure \ref{server2}.
+
 \begin{figure}[h]
-\caption{Beginning of Server Code}
+\caption{Server code to connect to each client}
 \centering
 \includegraphics[width=0.5\textwidth]{media/serverFlowchart1.png}
+\label{server1}
 \end{figure}
+
+When a client connects, the server creates a new thread to run the code loop demonstrated in Figure \ref{server1}. The object running this thread is appended to a list of active client connections. When a message is sent from the server, the server will go through this list and forward the message to each client.
+
+\begin{figure}[h]
+\caption{Code running at beginning of Client Program}
+\centering
+\includegraphics[width=0.5\textwidth]{media/clientFlowchart2.png}
+\label{client2}
+\end{figure}
+
+When the user decides to connect to a server as a client, the code described in Figure \ref{client2} is run. First, the user is prompted for information including the IP address of the server they are connecting to, the username they would like to use, and the encryption key they will use. Then, two threads are created, one to handle sending and one for receiving.
+
+\begin{figure}[h]
+\caption{Code loop to handle sending messages to the server}
+\centering
+\includegraphics[width=0.5\textwidth]{media/clientFlowchart1.png}
+\label{client1}
+\end{figure}
+
+Figure \ref{client1} gives an overview of the code facilitating the sending of messages from client to server. The program waits for input from the user, and when a message is entered, it checks for a command at the beginning of the message. Currently, the only command available is "!send" to send a file, but other commands could be implemented in the future as well. If no command is present, then the message is encrypted and sent to the server.
+
+\begin{figure}[h]
+\caption{Client code to receive messages from the server}
+\centering
+\includegraphics[width=0.5\textwidth]{media/clientFlowchart3.png}
+\label{client3}
+\end{figure}
+
+Finally, the code describing the receiving of messages is described in Figure \ref{client3}. Each client will wait for a message to arrive from the server, and will then check the messages header to determine what kind of processing is required. For a text message, that is decrypting the message and printing it to the screen, and for a sent file, that is parsing the filename and writing the file itself to that file.
 
 \subsection{Encryption}
 
-Used a form of AES encryption, blah blah
+% Used a form of AES encryption, blah blah
 
 \subsection{File Sharing}
 
-Got these to add how I wanted them to, nice. 
+% Got these to add how I wanted them to, nice. 
 
 \section{Experimental Results}
 
